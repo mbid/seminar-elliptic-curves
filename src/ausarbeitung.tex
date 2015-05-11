@@ -1,21 +1,268 @@
-\documetclass{amsart}
+% make rubber recompile for biber:
+% rubber: watch ausarbeitung.bcf 
+% rubber: onchange ausarbeitung.bcf 'biber ausarbeitung'
 
-% \usepackage[utf8]{inputenc}
-% \usepackage{mathtools}
+\documentclass{amsart}
+
+% packages
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
 \usepackage[ngerman]{babel}
-% \usepackage{geometry}
-% \usepackage{dsfont}
+%\usepackage{paralist}
+\usepackage{extarrows}
+\usepackage{dsfont}
+\usepackage{amsthm}
 
+% bibliography
 \usepackage[backend=biber]{biblatex}
 \DeclareFieldFormat{postnote}{#1}
 \addbibresource{bibliography.bib}
 
+% page layout
+\usepackage{geometry}
+\geometry{verbose,a4paper,tmargin=3.5cm,bmargin=2.5cm,lmargin=2.6cm,rmargin=2.6cm}
+
+
+% theorem styles
+\theoremstyle{plain}
+\newtheorem{proposition}[subsection]{Satz}
+\newtheorem{corollary}[subsection]{Korollar}
+\newtheorem{lemma}[subsection]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}[subsection]{Definition}
+\newtheorem{remark}[subsection]{Bemerkung}
+\newtheorem*{notation}{Notation}
+
+
+% custom environments
+%\newenvironment{enumeratei}
+%	{\begin{compactenum}[(i)]}
+%	{\end{compactenum}}
+%
+
+% custom commands
+\newcommand{\projspace}{\mathds{P}}
+\newcommand{\pic}{\operatorname{Pic}}
+\newcommand{\divgrp}{\operatorname{Div}}
+\newcommand{\rightarrowiso}{\xlongrightarrow{\sim}}
+\newcommand{\affinespace}{\mathds{A}}
+\renewcommand{\hom}{\operatorname{Hom}}
+
 \begin{document}
 
-\section{Varietäten als Schemata}
+
+%\section{Varietäten als Schemata}
+%\label{section-varietäten-als-schemata}
+%
+%
 
 \section{Jakobische Varietät}
+\label{section-jakobische-varietaet}
+
+Eine Besonderheit elliptischer Kurven ist die Tatsache, dass diese Kurven ihre eigene Jakobische sind.
+Die Jakobische einer Kurve ist eine Varietät, deren $k$-wertigen Punkte eine zur $Pic^0$-Gruppe der Kurve isomorphe Gruppenstruktur tragen.
+Der Beweis der Existenz der Jakobischen für allgemeine Kurven ist nichttrivial, im Falle von elliptischen Kurven (die über die im letzten Vortrag vorgestellte Gruppenstruktur der $k$-wertigen Punkte ihre eigene Jakobische ist) aber im Rahmen unserer Möglichkeiten aber machbar.
+In diesem Abschnitt wird (ohne Beweise) ein kurzer Einblick in die Theorie der Jakobischen gegeben.
+
+\begin{definition}
+	\label{def-gruppenobjekt}
+	Sei $C$ eine Kategorie, in der endliche Produkte existieren. Insbesondere besitzt $C$ ein terminales Objekt $*$.
+	Ein Objekt $G \in C$ zusammen mit Morphismen
+	\begin{align*}
+		& \operatorname{mul} \colon E \times E \rightarrow E \\
+		& \operatorname{inv} \colon E \rightarrow E \\
+		& \operatorname{eins} \colon * \rightarrow E
+	\end{align*}
+	so, dass die Diagramme
+	\begin{equation*}
+	\end{equation*}
+	kommutieren, heißt {\it Gruppenobjekt}.
+	Kommutiert auch
+	\begin{equation*}
+	\end{equation*}
+	so heißt $G$ {\it abelsches} Gruppenobjekt.
+\end{definition}
+
+\begin{remark}
+	Ein Gruppenobjekt $G$ kann über die Yoneda-Einbettung auch folgendermaßen charakterisiert werden:
+
+	\noindent Ist $S \in C$ ein beliebiges Objekt, so wird $\hom(S, G)$ vermöge
+	\begin{align*}
+		& f \cdot g \coloneqq \operatorname{mul} \circ (f \times g) \\
+		& 1 = \operatorname{eins} \circ (S \rightarrow *) \\
+		& f^{-1} = \operatorname{inv} \circ f
+	\end{align*}
+	für $f, g \in \hom(S, G)$ zur Gruppe. Ein Morphismus $\phi \in \hom(S, T)$ ergibt mit dieser Definition einen Morphismus von Gruppen
+	\begin{equation*}
+		- \circ \phi \colon \hom(T, G) \rightarrow \hom(S, G).
+	\end{equation*}
+	Ist umgekehrt für alle $S \in C$ eine in $S$ funktorielle (abelsche) Gruppenstruktur auf $\hom(S, G)$ gegeben, so ergeben die natürlichen Transformationen
+	\begin{align*}
+		\eta_{\operatorname{mul}} \colon &
+		\begin{cases}
+			\hom(-, G) \times \hom(-, G) \rightarrow \hom(-, G) \\
+			\hom(S, G) \times \hom(S, G) \ni (f, g) \mapsto f + g \in \hom(S, G)
+		\end{cases} \\
+		\eta_{\operatorname{inv}} \colon &
+		\begin{cases}
+			\hom(-, G) \rightarrow \hom(-, G) \\
+			\hom(S, G) \ni f \mapsto f^{-1} \in \hom(S, G)
+		\end{cases} \\
+		\eta_{\operatorname{eins}} \colon &
+		\begin{cases}
+			\hom(-, *) \rightarrow \hom(-, G) \\
+			\hom(S, *) \ni f \mapsto 1 \in \hom(S, G)
+		\end{cases} \\
+	\end{align*}
+	nach dem Yoneda-Lemma ($X \mapsto \hom(-, X)$ ist voll-treue Einbettung in die Funktorkategorie $C \mapsto \operatorname{Set}$) die Morphismen $\operatorname{mul}$, $\operatorname{inv}$ und $\operatorname{eins}$ wie in \ref{def-gruppenobjekt}.
+\end{remark}
+
+\begin{definition}
+	Ein Gruppenobjekt in der Kategorie der Schemata über einem Schema $S$ heißt {\it algebraische Gruppe über $S$}.
+\end{definition}
+
+\begin{definition}
+	Sei $k$ ein Körper. Eine algebraische Gruppe $A$ über $k$ heißt {\it abelsche Varietät über $k$}, falls $A$ geometrische integer und eigentlich über $k$ ist.
+\end{definition}
+
+\noindent Der Name {\it abelsche} Varietät ist durch folgenden Satz gerechtfertigt:
+\begin{proposition}
+	Eine abelsche Varietät über $k$ ist notwendig projektiv und ein abelsches Gruppenobjekt.
+\end{proposition}
+
+\begin{proposition}
+	Sei $C$ eine glatte, geometrische zusammenhängende, projektive Kurve über $k$ vom Geschlecht $g$. Dann existiert eine abelsche Varietät $J$ über $k$ der Dimension $g$ so, dass 
+	\begin{equation*}
+		J(L) \cong \pic^0(C_L)
+	\end{equation*}
+	für jede Körpererweiterung $L|k$ mit $C(L) \neq \emptyset$, funktoriell in $L$.
+\end{proposition}
+
+
+
 
 \section{Elliptische Kurven}
+\label{section-elliptische-kurven}
+
+In diesem Abschnitt wird die Gleichheit elliptischer Kurven und ihrer Jakobischen bewiesen.
+Zu Beginn werden elliptische Kurven als nichtsinguläre Kurven vom Geschlecht 1 mit einem ausgezeichneten Basispunkt definiert.
+Wir werden sehen, dass elliptische Kurven sich alternativ auch als nichtsinguläre, durch eine Weierstraß-Gleichung gegebene Kurven charakterisieren lassen. \\
+Im zweiten Teil wird eine Isomorphie der $\pic^0$-Gruppe mit der durch die im letzten Vortrag kennen gelernte Addition auf einer elliptischen Kurve gegebenen Gruppenstruktur bewiesen werden.
+Da die Addition auf elliptischen Kurven sich als Morphismus herausstellen wird, ist die elliptische Kurve damit ihre eigene Jakobische.
+Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an \cite{silverman}.
+
+\begin{definition}
+	Ein Paar $(E, O)$, wobei $E$ eine nichtsinguläre Kurve vom Geschlecht 1, $O \in E$ ein Punkt sind, heißt {\it elliptische Kurve}.
+	Die elliptische Kurve heißt {\it definiert über $k$}, falls $E$ über $k$ definiert ist und $O \in E(k)$. Insbesondere besitzt $E$ einen $k$-rationalen Punkt.
+\end{definition}
+
+\begin{notation}
+	Im Folgenden sei stets $k$ ein Körper mit algebraischem Abschluss $K$, $(E, O)$ eine über $k$ definierte elliptische Kurve. 
+	Statt $(E, O)$ schreiben wir auch einfach $E$, womit implizit eine elliptische Kurve mit Basispunkt $O$ gemeint ist.
+\end{notation}
+
+\begin{proposition}
+	\label{prop-existenz-weierstrass-koordinaten}
+	Es existieren $x, y \in k(E)$ so, dass
+	\begin{equation*}
+		\phi = [x, y, 1] : E \rightarrow C
+	\end{equation*}
+	ein Basispunkt-erhaltender Isomorphismus von $E$ mit einer durch eine Weierstraß-Gleichung definierten Kurve $C \subset \projspace^2$ über $k$ ist. \\
+	$C$ ist also gegeben durch
+	\begin{equation*}
+		Y^2 + a_1 XY + a_3 Y = X^3 + a_2 X^2 + a_4 X + a_6
+	\end{equation*}
+	mit $a_1, \dots, a_6 \in k$ und
+	\begin{equation*}
+		\phi(O) = (0 : 1 : 0).
+	\end{equation*}
+\end{proposition}
+
+\begin{definition}
+	$x, y \in k(E)$ wie in \ref{prop-existenz-weierstrass-koordinaten} heißen {\it Weierstraß-Koordinaten}.
+\end{definition}
+
+\begin{proposition}
+	Seien $(x, y)$, $(x', y')$ zwei Paare von Weierstraß-Koordinaten. Dann existieren $u, r, s, t \in k, u \neq 0$ so, dass
+	\begin{align*}
+		x &= u^2 x' + r \\
+		y &= u^3 y' + s u^2 x' + t.
+	\end{align*}
+\end{proposition}
+
+\begin{proposition}
+	Sei $C$ eine nichtsinguläre Kurve über $k$, gegeben durch eine Weierstraß-Gleichung. Dann ist $(C, (0 : 1 : 0))$ eine elliptische Kurve.
+\end{proposition}
+
+\begin{lemma}
+	Seien $P, Q \in E$. Dann gilt
+	\begin{equation*}
+		(P) \sim (Q) \Leftrightarrow P = Q
+	\end{equation*}
+\end{lemma}
+
+\begin{proposition}
+	\label{prop-isomorphism-pic}
+	Die Funktion
+	\begin{equation*}
+		\kappa \colon \begin{cases}
+			E \rightarrow \pic^0(E) \\
+			P \mapsto \overline{(P) - (O)}
+		\end{cases}
+	\end{equation*}
+	ist ein Isomorphismus abelscher Gruppen.
+\end{proposition}
+
+\begin{proposition}
+	Die natürliche Abbildung
+	\begin{equation*}
+		\divgrp_k^0 \mapsto \pic_k^0(E)
+	\end{equation*}
+	ist surjektiv. $\kappa$ aus \ref{prop-isomorphism-pic} beschränkt sich zu 
+	\begin{equation*}
+		E(k) \rightarrowiso \pic_k^0(E).
+	\end{equation*}
+\end{proposition}
+
+\begin{corollary}
+	Die Sequenz
+	\begin{equation*}
+		1 \rightarrow k(E)^{\times} \rightarrow \divgrp_k^0(E) \rightarrow \pic_k^0(E) \rightarrow 0
+	\end{equation*}
+	ist exakt.
+\end{corollary}
+
+\begin{corollary}
+	Sei $D \in \divgrp_k(E)$. Dann gilt
+	\begin{equation*}
+		D \sim 0 \Leftrightarrow \deg D = 0 \text{ und } \sum_{P \in E} n_P P = 0.
+	\end{equation*}
+\end{corollary}
+
+\begin{proposition}
+	Die Abbildungen
+	\begin{align*}
+		\operatorname{add} \colon &
+		\begin{cases}
+			E \times E \rightarrow E \\
+			(P, Q) \mapsto P + Q
+		\end{cases} \\
+		\operatorname{inv} \colon &
+		\begin{cases}
+			E \rightarrow E \\
+			P \mapsto -P
+		\end{cases} \\
+		\operatorname{null} \colon &
+		\begin{cases}
+			\affinespace^0 \rightarrow E \\
+			0 \mapsto O
+		\end{cases}
+	\end{align*}
+	sind Morphismen von Varietäten. $E$ wird vermöge dieser Abbildungen zum Gruppenobjekt in der Kategorie der Varietäten über $k$.
+\end{proposition}
+
+\printbibliography
 
 \end{document}
+
