@@ -42,28 +42,78 @@
 %
 
 % custom commands
+\newcommand{\rightarrowiso}{\xlongrightarrow{\sim}}
 \newcommand{\projspace}{\mathds{P}}
+\newcommand{\affinespace}{\mathds{A}}
+\newcommand{\spec}{\operatorname{Spec}}
+\newcommand{\proj}{\operatorname{Proj}}
 \newcommand{\pic}{\operatorname{Pic}}
 \newcommand{\divgrp}{\operatorname{Div}}
-\newcommand{\rightarrowiso}{\xlongrightarrow{\sim}}
-\newcommand{\affinespace}{\mathds{A}}
 \renewcommand{\hom}{\operatorname{Hom}}
+\newcommand{\idealp}{\mathfrak{p}}
+
 
 \begin{document}
 
+\section{Varietäten als Schemata}
+\label{section-varietaeten-als-schemata}
 
-%\section{Varietäten als Schemata}
-%\label{section-varietäten-als-schemata}
-%
-%
+In bisherigen Vorträgen wurde stets die klassische Sprache der algebraischen Geometrie genutzt.
+In diesem Abschnitt werden wir erklären, wie klassische Begriffe sich im Schema-Formalismus formulieren lassen.
+Besonderes Augenmerk wird auf die Definition einer \glqq Varietät über $k$\grqq, $k$ ein nicht notwendig algebraisch abgeschlossener Körper, und deren $k$-rationalen Punkten gelegt.
+
+\begin{proposition}
+	\label{prop-rationale-punkte}
+
+	Sei $k$ ein Körper, $V$ eine über $k$ definierte affine (projektive) Varietät im Sinne von \cite[Kap. I]{silverman}. \\
+	$V$ ist also Nullstellenmenge eines (homogenen) Primideals $\idealp \subseteq k[\underline{X}]$ in $\affinespace_K^n$ bzw. $\projspace_K^n$. \\
+	Sei $X = \spec k[X_1, \dots, X_n] / \idealp$ bzw. $X = \proj k[X_1, \dots, X_n] / \idealp$. Dann ist für jede algebraische Erweiterung $L | k$
+	\begin{equation*}
+		V(L) = \{P \in V | P \text{ ist } L\text{-rational}\} \cong \hom_{\spec L}(\spec L, X_L).
+	\end{equation*}
+	Dabei bezeichnet $X_L = X \times_{\spec k} \spec L$ den Basiswechsel nach $\spec L$.
+\end{proposition}
+\begin{proof}
+	Sei zunächst $V$ affin. Dann ist
+	\begin{equation*}
+		X_L = \spec k[X_1, \dots, X_n] / \idealp \otimes_k L = \spec L[X_1, \dots, X_n] / \idealp_L,
+	\end{equation*}
+	wobei $\idealp_L$ das von $\idealp$ in $L[X_1, \dots, X_n]$ erzeugte Ideal sei.
+	Man erhält Bijektionen
+	\begin{align*}
+		\hom_{\spec L}(\spec L, X)
+			& \cong \{(P, i) | P \in X, i \colon \kappa(P) \rightarrow L \text{ Morphismus von } L \text{-Algebren}\} \\
+			& \cong \{P \in X | \kappa(P) \cong L\} \\
+			& \cong \{P \in X | P = (X_1 - a_1, \dots, X_n - a_n) \text{ für gewisse } a_1, \dots, a_n \in L\} \\
+			& \cong V(L)
+	\end{align*}
+	Der Fall $V$ projektiv lässt sich einfach durch eine offene affine Überdeckung des $\projspace^n$ auf den affinen Fall zurückführen.
+\end{proof}
+
+\noindent Für $L = k$ erhält man insbesondere eine Charakterisierung der $k$-rationalen Punkte von $V$: 
+\begin{equation*}
+	V(k) \cong \hom_{\spec k}(\spec k, X)
+\end{equation*}
+
+\begin{remark}
+	Für beliebige Primideale $\idealp \subset k[X_1, \dots X_n]$ ist (in der Notation von \ref{prop-rationale-punkte}) ist $X_L$ nicht notwendig irreduzibel.
+	Das Ideal $\idealp = (X^2 + 1) \subset \mathds{R}[X]$ ist irreduzibel, nach Übergang zu $\mathds{C}$ zerfällt es jedoch. \\
+	Schemata, die nach Basiswechsel zu beliebigen Erweiterungskörpern irreduzibel bleiben, heißen auch {\it geometrisch irreduzibel}.
+	Analog definiert man auch {\it geometrisch zusammenhängend}, {\it geometrisch reduziert}, usw..
+\end{remark}
 
 \section{Jakobische Varietät}
 \label{section-jakobische-varietaet}
 
 Eine Besonderheit elliptischer Kurven ist die Tatsache, dass diese Kurven ihre eigene Jakobische sind.
 Die Jakobische einer Kurve ist eine Varietät, deren $k$-wertigen Punkte eine zur $\pic^0$-Gruppe der Kurve isomorphe Gruppenstruktur tragen.
-Der Beweis der Existenz der Jakobischen für allgemeine Kurven ist nichttrivial, im Falle von elliptischen Kurven (die über die im letzten Vortrag vorgestellte Gruppenstruktur der $k$-wertigen Punkte ihre eigene Jakobische ist) aber im Rahmen unserer Möglichkeiten aber machbar.
+Der Beweis der Existenz der Jakobischen für allgemeine Kurven ist nichttrivial, im Falle von elliptischen Kurven (die über die im letzten Vortrag vorgestellte Gruppenstruktur der $k$-wertigen Punkte ihre eigene Jakobische ist) aber recht einfach möglich.
 In diesem Abschnitt wird (ohne Beweise) ein kurzer Einblick in die Theorie der Jakobischen gegeben.
+Für eine ausführliche Abhandlung, siehe etwa \cite{liu} oder \cite{hartshorne}. \\
+
+\noindent Jakobische Kurven sind Gruppenobjekte in der Kategorie der Schemata über $k$.
+Unter einem Gruppenobjekt kann anschaulich ein Objekt einer Kategorie verstanden werden, das die Struktur einer Gruppe trägt.
+Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss diese Struktur \glqq elementfrei\grqq durch Angabe von Morphismen gegeben werden.
 
 \begin{definition}
 	\label{def-gruppenobjekt}
@@ -115,7 +165,11 @@ In diesem Abschnitt wird (ohne Beweise) ein kurzer Einblick in die Theorie der J
 			\hom(S, *) \ni f \mapsto 1 \in \hom(S, G)
 		\end{cases} \\
 	\end{align*}
-	nach dem Yoneda-Lemma ($X \mapsto \hom(-, X)$ ist voll-treue Einbettung in die Funktorkategorie $C \mapsto \operatorname{Set}$) die Morphismen $\operatorname{mul}$, $\operatorname{inv}$ und $\operatorname{eins}$ wie in \ref{def-gruppenobjekt}.
+	nach dem Yoneda-Lemma 
+	\begin{equation*}
+		X \mapsto \hom(-, X) \text{ ist voll-treue Einbettung in die Funktorkategorie } C \mapsto \operatorname{Set}
+	\end{equation*}
+	 die Morphismen $\operatorname{mul}$, $\operatorname{inv}$ und $\operatorname{eins}$ wie in \ref{def-gruppenobjekt}.
 \end{remark}
 
 \begin{definition}
@@ -126,7 +180,7 @@ In diesem Abschnitt wird (ohne Beweise) ein kurzer Einblick in die Theorie der J
 	Sei $k$ ein Körper. Eine algebraische Gruppe $A$ über $k$ heißt {\it abelsche Varietät über $k$}, falls $A$ geometrische integer und eigentlich über $k$ ist.
 \end{definition}
 
-\noindent Der Name {\it abelsche} Varietät ist durch folgenden Satz gerechtfertigt:
+\noindent Die Bezeichnung {\it abelsche} Varietät ist durch folgenden Satz gerechtfertigt:
 \begin{proposition}
 	Eine abelsche Varietät über $k$ ist notwendig projektiv und ein abelsches Gruppenobjekt.
 \end{proposition}
@@ -150,7 +204,7 @@ Zu Beginn werden elliptische Kurven als nichtsinguläre Kurven vom Geschlecht 1 
 Wir werden sehen, dass elliptische Kurven sich alternativ auch als nichtsinguläre, durch eine Weierstraß-Gleichung gegebene Kurven charakterisieren lassen. \\
 Im zweiten Teil wird eine Isomorphie der $\pic^0$-Gruppe mit der durch die im letzten Vortrag kennen gelernte Addition auf einer elliptischen Kurve gegebenen Gruppenstruktur bewiesen werden.
 Da die Addition auf elliptischen Kurven sich als Morphismus herausstellen wird, ist die elliptische Kurve damit ihre eigene Jakobische.
-Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an \cite{silverman}.
+Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an \cite{silverman}, woraus dieser Abschnitt auch weitgehend übernommen wurde, verwendet.
 
 \begin{definition}
 	Ein Paar $(E, O)$, wobei $E$ eine nichtsinguläre Kurve vom Geschlecht 1, $O \in E$ ein Punkt sind, heißt {\it elliptische Kurve}.
