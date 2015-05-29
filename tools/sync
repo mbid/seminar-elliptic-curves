@@ -1,0 +1,16 @@
+#!/bin/sh
+
+while true
+do
+	echo "getting file..."
+	rsync -e ssh "mobile-sync@meb.ddns.net:data/maths/Vorlesungen/15\ SS/Seminar\ Elliptische\ Kurven/Ausarbeitung/build/ausarbeitung.pdf" build/ausarbeitung-sync.pdf
+	if ! diff build/ausarbeitung.pdf build/ausarbeitung-sync.pdf > /dev/null
+	then
+		echo "file differs, updating ausarbeitung.pdf"
+		cp build/ausarbeitung-sync.pdf build/ausarbeitung.pdf
+	else
+		echo "file did not change"
+	fi
+	sleep 0.3
+done
+
