@@ -1,17 +1,17 @@
-% make rubber recompile for biber:
-% rubber: watch ausarbeitung.bcf 
-% rubber: onchange ausarbeitung.bcf 'biber ausarbeitung'
-
 \documentclass{amsart}
 
 % packages
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
+\usepackage{mathabx}
 \usepackage[ngerman]{babel}
-%\usepackage{paralist}
+\usepackage{paralist}
 \usepackage{extarrows}
 \usepackage{dsfont}
 \usepackage{amsthm}
+
+\usepackage{tikz}
+\usetikzlibrary{babel, cd} % babel is needed for '"' to be interpreted correctly in arrow labels
 
 % bibliography
 \usepackage[backend=biber]{biblatex}
@@ -36,10 +36,10 @@
 
 
 % custom environments
-%\newenvironment{enumeratei}
-%	{\begin{compactenum}[(i)]}
-%	{\end{compactenum}}
-%
+\newenvironment{enumeratei}
+	{\begin{compactenum}[(i)]}
+	{\end{compactenum}}
+
 
 % custom commands
 \newcommand{\rightarrowiso}{\xlongrightarrow{\sim}}
@@ -49,27 +49,44 @@
 \newcommand{\proj}{\operatorname{Proj}}
 \newcommand{\pic}{\operatorname{Pic}}
 \newcommand{\divgrp}{\operatorname{Div}}
+\newcommand{\divop}{\operatorname{div}}
+\newcommand{\charop}{\operatorname{char}}
 \renewcommand{\hom}{\operatorname{Hom}}
 \newcommand{\idealp}{\mathfrak{p}}
-
+\newcommand{\functorcat}{\operatorname{Mor}}
+\newcommand{\genus}{\operatorname{Geschlecht}}
+\newcommand{\riemannspace}{\mathcal{L}}
+\newcommand{\ord}{\operatorname{ord}}
+\newcommand{\coset}[1]{\overline{#1}}
+\newcommand{\gal}{\operatorname{Gal}}
+\makeatletter
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin20pt}
+\newcommand{\mathcenter}{\@fleqnfalse}
+\makeatother
+\newcommand{\id}{\operatorname{id}}
 
 \begin{document}
+
+\title{Elliptische Kurven und Abelsche Varietäten}
+\author{Martin Bidlingmaier}
+%\date{30.04.2015}
+\maketitle
 
 \section{Varietäten als Schemata}
 \label{section-varietaeten-als-schemata}
 
 In bisherigen Vorträgen wurde stets die klassische Sprache der algebraischen Geometrie genutzt.
-In diesem Abschnitt werden wir erklären, wie klassische Begriffe sich im Schema-Formalismus formulieren lassen.
+In diesem Abschnitt wird erklärt, wie klassische Begriffe sich im Schema-Formalismus formulieren lassen.
 Besonderes Augenmerk wird auf die Definition einer \glqq Varietät über $k$\grqq, $k$ ein nicht notwendig algebraisch abgeschlossener Körper, und deren $k$-rationalen Punkten gelegt.
 
 \begin{proposition}
 	\label{prop-rationale-punkte}
 
-	Sei $k$ ein Körper, $V$ eine über $k$ definierte affine (projektive) Varietät im Sinne von \cite[Kap. I]{silverman}. \\
+	Sei $k$ ein Körper, $V$ eine über $k$ definierte affine (projektive) Varietät im Sinne von \cite[Kap.~I]{silverman}. \\
 	$V$ ist also Nullstellenmenge eines (homogenen) Primideals $\idealp \subseteq k[\underline{X}]$ in $\affinespace_K^n$ bzw. $\projspace_K^n$. \\
 	Sei $X = \spec k[X_1, \dots, X_n] / \idealp$ bzw. $X = \proj k[X_1, \dots, X_n] / \idealp$. Dann ist für jede algebraische Erweiterung $L | k$
 	\begin{equation*}
-		V(L) = \{P \in V | P \text{ ist } L\text{-rational}\} \cong \hom_{\spec L}(\spec L, X_L).
+		V(L) = \{P \in V \mid P \text{ ist } L\text{-rational}\} \cong \hom_{\spec L}(\spec L, X_L).
 	\end{equation*}
 	Dabei bezeichnet $X_L = X \times_{\spec k} \spec L$ den Basiswechsel nach $\spec L$.
 \end{proposition}
@@ -79,13 +96,13 @@ Besonderes Augenmerk wird auf die Definition einer \glqq Varietät über $k$\grq
 		X_L = \spec k[X_1, \dots, X_n] / \idealp \otimes_k L = \spec L[X_1, \dots, X_n] / \idealp_L,
 	\end{equation*}
 	wobei $\idealp_L$ das von $\idealp$ in $L[X_1, \dots, X_n]$ erzeugte Ideal sei.
-	Man erhält Bijektionen
+	Man erhält Bijektionen (siehe \cite[§3 Prop. 3.8]{gortz-wedhorn})
 	\begin{align*}
 		\hom_{\spec L}(\spec L, X)
-			& \cong \{(P, i) | P \in X, i \colon \kappa(P) \rightarrow L \text{ Morphismus von } L \text{-Algebren}\} \\
-			& \cong \{P \in X | \kappa(P) \cong L\} \\
-			& \cong \{P \in X | P = (X_1 - a_1, \dots, X_n - a_n) \text{ für gewisse } a_1, \dots, a_n \in L\} \\
-			& \cong V(L)
+			& \cong \{(P, i) \mid P \in X, i \colon \kappa(P) \rightarrow L \text{ Morphismus von } L \text{-Algebren}\} \\
+			& \cong \{P \in X \mid \kappa(P) \cong L\} \\
+			& \cong \{P \in X \mid P = (X_1 - a_1, \dots, X_n - a_n) \text{ für gewisse } a_1, \dots, a_n \in L\} \\
+			& \cong V(L).
 	\end{align*}
 	Der Fall $V$ projektiv lässt sich einfach durch eine offene affine Überdeckung des $\projspace^n$ auf den affinen Fall zurückführen.
 \end{proof}
@@ -96,7 +113,7 @@ Besonderes Augenmerk wird auf die Definition einer \glqq Varietät über $k$\grq
 \end{equation*}
 
 \begin{remark}
-	Für beliebige Primideale $\idealp \subset k[X_1, \dots X_n]$ ist (in der Notation von \ref{prop-rationale-punkte}) ist $X_L$ nicht notwendig irreduzibel.
+	Für beliebige Primideale $\idealp \subset k[X_1, \dots X_n]$ ist (in der Notation von \ref{prop-rationale-punkte}) $X_L$ nicht notwendig irreduzibel.
 	Das Ideal $\idealp = (X^2 + 1) \subset \mathds{R}[X]$ ist irreduzibel, nach Übergang zu $\mathds{C}$ zerfällt es jedoch. \\
 	Schemata, die nach Basiswechsel zu beliebigen Erweiterungskörpern irreduzibel bleiben, heißen auch {\it geometrisch irreduzibel}.
 	Analog definiert man auch {\it geometrisch zusammenhängend}, {\it geometrisch reduziert}, usw..
@@ -106,30 +123,74 @@ Besonderes Augenmerk wird auf die Definition einer \glqq Varietät über $k$\grq
 \label{section-jakobische-varietaet}
 
 Eine Besonderheit elliptischer Kurven ist die Tatsache, dass diese Kurven ihre eigene Jakobische sind.
-Die Jakobische einer Kurve ist eine Varietät, deren $k$-wertigen Punkte eine zur $\pic^0$-Gruppe der Kurve isomorphe Gruppenstruktur tragen.
-Der Beweis der Existenz der Jakobischen für allgemeine Kurven ist nichttrivial, im Falle von elliptischen Kurven (die über die im letzten Vortrag vorgestellte Gruppenstruktur der $k$-wertigen Punkte ihre eigene Jakobische ist) aber recht einfach möglich.
+Die Jakobische einer Kurve ist eine Varietät, deren $k$-rationale Punkte eine zur $\pic^0$-Gruppe der Kurve isomorphe Gruppenstruktur tragen.
+Der Beweis der Existenz der Jakobischen allgemeiner Kurven erfordert fortgeschrittene Techniken; im Falle von elliptischen Kurven, die über die im letzten Vortrag vorgestellte Gruppenstruktur ihre eigene Jakobischen sind, aber mit unseren Mitteln möglich.
 In diesem Abschnitt wird (ohne Beweise) ein kurzer Einblick in die Theorie der Jakobischen gegeben.
-Für eine ausführliche Abhandlung, siehe etwa \cite{liu} oder \cite{hartshorne}. \\
-
-\noindent Jakobische Kurven sind Gruppenobjekte in der Kategorie der Schemata über $k$.
+Für eine ausführlichere Abhandlung siehe etwa \cite{hartshorne} oder \cite{liu}. \\
+Jakobische Varietäten sind Gruppenobjekte in der Kategorie der Schemata über $k$.
 Unter einem Gruppenobjekt kann anschaulich ein Objekt einer Kategorie verstanden werden, das die Struktur einer Gruppe trägt.
-Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss diese Struktur \glqq elementfrei\grqq durch Angabe von Morphismen gegeben werden.
+Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss diese Struktur "`elementfrei"' durch Angabe von Morphismen gegeben werden.
 
 \begin{definition}
 	\label{def-gruppenobjekt}
+	\nocite{gortz-wedhorn}
 	Sei $C$ eine Kategorie, in der endliche Produkte existieren. Insbesondere besitzt $C$ ein terminales Objekt $*$.
-	Ein Objekt $G \in C$ zusammen mit Morphismen
+	Ein Objekt $G \in C$ zusammen mit Morphismen \\
 	\begin{align*}
-		& \operatorname{mul} \colon E \times E \rightarrow E \\
-		& \operatorname{inv} \colon E \rightarrow E \\
-		& \operatorname{eins} \colon * \rightarrow E
+		m \colon & E \times E \rightarrow E \\
+		i \colon & E \rightarrow E \\
+		e \colon & * \rightarrow E
 	\end{align*}
 	so, dass die Diagramme
 	\begin{equation*}
+		\begin{array}{cl}
+			\begin{tikzcd}
+				G \times G \times G \arrow[r, "\id_G \times m"] \arrow[d, "m \times \id_G"]
+				& G \times G \arrow[d, "m"]
+				\\
+				G \times G \arrow[r, "m"]
+				& G
+			\end{tikzcd}
+			&
+			\textit{\glqq Assoziativität\grqq}
+			\\
+			\\
+			\begin{tikzcd}
+				G \times * \arrow[r, "{\langle \id_G, e \rangle}"] \arrow[d, "\rotatebox{90}{$\sim$}"]
+				& G \times G \arrow[d, "m"]
+				\\
+				G \arrow[r, "\id_G"]
+				& G
+			\end{tikzcd}
+			&
+			\textit{\glqq Neutrales Element\grqq}
+			\\
+			\\
+			\begin{tikzcd}
+				G \arrow[r, "{\langle \id_G, i \rangle}"] \arrow[d, "\id_G"]
+				& G \times G \arrow[d, "m"]
+				\\
+				* \arrow[r, "e"]
+				& G
+			\end{tikzcd}
+			&
+			\textit{\glqq Inverses Element\grqq}
+		\end{array}
 	\end{equation*}
 	kommutieren, heißt {\it Gruppenobjekt}.
 	Kommutiert auch
 	\begin{equation*}
+		\begin{array}{cl}
+			\begin{tikzcd}
+				G \times G \arrow[r, "{\langle \pi_2, \pi_1 \rangle}"] \arrow[d, "\id_{G \times G}"]
+				& G \times G \arrow[d, "m"]
+				\\
+				G \times G \arrow[r, "m"]
+				& G
+			\end{tikzcd}
+			&
+			\textit{\glqq Kommutativität\grqq},
+		\end{array}
 	\end{equation*}
 	so heißt $G$ {\it abelsches} Gruppenobjekt.
 \end{definition}
@@ -139,27 +200,27 @@ Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss die
 
 	\noindent Ist $S \in C$ ein beliebiges Objekt, so wird $\hom(S, G)$ vermöge
 	\begin{align*}
-		& f \cdot g \coloneqq \operatorname{mul} \circ (f \times g) \\
-		& 1 = \operatorname{eins} \circ (S \rightarrow *) \\
-		& f^{-1} = \operatorname{inv} \circ f
+		& f \cdot g \coloneqq m \circ (f \times g) \\
+		& 1 = e \circ (S \rightarrow *) \\
+		& f^{-1} = i \circ f
 	\end{align*}
-	für $f, g \in \hom(S, G)$ zur Gruppe. Ein Morphismus $\phi \in \hom(S, T)$ ergibt mit dieser Definition einen Morphismus von Gruppen
+	für $f, g \in \hom(S, G)$ zur Gruppe. Ein Morphismus $\phi \in \hom(S, T)$ ergibt mit dieser Definition einen Gruppenhomomorphismus
 	\begin{equation*}
 		- \circ \phi \colon \hom(T, G) \rightarrow \hom(S, G).
 	\end{equation*}
 	Ist umgekehrt für alle $S \in C$ eine in $S$ funktorielle (abelsche) Gruppenstruktur auf $\hom(S, G)$ gegeben, so ergeben die natürlichen Transformationen
 	\begin{align*}
-		\eta_{\operatorname{mul}} \colon &
+		\eta_{m} \colon &
 		\begin{cases}
 			\hom(-, G) \times \hom(-, G) \rightarrow \hom(-, G) \\
 			\hom(S, G) \times \hom(S, G) \ni (f, g) \mapsto f + g \in \hom(S, G)
 		\end{cases} \\
-		\eta_{\operatorname{inv}} \colon &
+		\eta_{i} \colon &
 		\begin{cases}
 			\hom(-, G) \rightarrow \hom(-, G) \\
 			\hom(S, G) \ni f \mapsto f^{-1} \in \hom(S, G)
 		\end{cases} \\
-		\eta_{\operatorname{eins}} \colon &
+		\eta_{e} \colon &
 		\begin{cases}
 			\hom(-, *) \rightarrow \hom(-, G) \\
 			\hom(S, *) \ni f \mapsto 1 \in \hom(S, G)
@@ -167,9 +228,9 @@ Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss die
 	\end{align*}
 	nach dem Yoneda-Lemma 
 	\begin{equation*}
-		X \mapsto \hom(-, X) \text{ ist voll-treue Einbettung in die Funktorkategorie } C \mapsto \operatorname{Set}
+		X \mapsto \hom(-, X) \text{ ist voll-treue Einbettung in die Funktorkategorie } \functorcat(C, \operatorname{Set})
 	\end{equation*}
-	 die Morphismen $\operatorname{mul}$, $\operatorname{inv}$ und $\operatorname{eins}$ wie in \ref{def-gruppenobjekt}.
+	die Morphismen $m$, $i$ und $e$ wie in \ref{def-gruppenobjekt}.
 \end{remark}
 
 \begin{definition}
@@ -182,15 +243,16 @@ Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss die
 
 \noindent Die Bezeichnung {\it abelsche} Varietät ist durch folgenden Satz gerechtfertigt:
 \begin{proposition}
-	Eine abelsche Varietät über $k$ ist notwendig projektiv und ein abelsches Gruppenobjekt.
+	Eine abelsche Varietät über $k$ ist notwendig projektiv und ein abelsches Gruppenobjekt. \qed
 \end{proposition}
 
+Nun stehen alle Begriffe bereit, um die Existenz der Jakobischen zu formulieren:
 \begin{proposition}
 	Sei $C$ eine glatte, geometrische zusammenhängende, projektive Kurve über $k$ vom Geschlecht $g$. Dann existiert eine abelsche Varietät $J$ über $k$ der Dimension $g$ so, dass 
 	\begin{equation*}
 		J(L) \cong \pic^0(C_L)
 	\end{equation*}
-	für jede Körpererweiterung $L|k$ mit $C(L) \neq \emptyset$, funktoriell in $L$.
+	für jede Körpererweiterung $L | k$ mit $C(L) \neq \emptyset$, funktoriell in $L$. \qed
 \end{proposition}
 
 
@@ -201,14 +263,14 @@ Da Objekte in allgemeinen Kategorien nicht notwendig Elemente besitzen, muss die
 
 In diesem Abschnitt wird die Gleichheit elliptischer Kurven und ihrer Jakobischen bewiesen.
 Zu Beginn werden elliptische Kurven als nichtsinguläre Kurven vom Geschlecht 1 mit einem ausgezeichneten Basispunkt definiert.
-Wir werden sehen, dass elliptische Kurven sich alternativ auch als nichtsinguläre, durch eine Weierstraß-Gleichung gegebene Kurven charakterisieren lassen. \\
-Im zweiten Teil wird eine Isomorphie der $\pic^0$-Gruppe mit der durch die im letzten Vortrag kennen gelernte Addition auf einer elliptischen Kurve gegebenen Gruppenstruktur bewiesen werden.
+Bis auf Isomorphie erfüllen diese Bedingung genau die nichtsingulären, durch eine Weierstraß-Gleichung gegebenen Kurven. \\
+Im zweiten Teil wird eine Isomorphie der $\pic^0$-Gruppe mit der durch die im letzten Vortrag kennen gelernten Addition auf einer elliptischen Kurve gegebenen Gruppenstruktur bewiesen werden.
 Da die Addition auf elliptischen Kurven sich als Morphismus herausstellen wird, ist die elliptische Kurve damit ihre eigene Jakobische.
-Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an \cite{silverman}, woraus dieser Abschnitt auch weitgehend übernommen wurde, verwendet.
+Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an \cite{silverman}, woraus dieser Abschnitt weitgehend übernommen wurde, verwendet.
 
 \begin{definition}
 	Ein Paar $(E, O)$, wobei $E$ eine nichtsinguläre Kurve vom Geschlecht 1, $O \in E$ ein Punkt sind, heißt {\it elliptische Kurve}.
-	Die elliptische Kurve heißt {\it definiert über $k$}, falls $E$ über $k$ definiert ist und $O \in E(k)$. Insbesondere besitzt $E$ einen $k$-rationalen Punkt.
+	Die elliptische Kurve heißt {\it definiert über $k$}, falls $E$ über $k$ definiert ist und $O \in E(k)$. Insbesondere besitzt $E$ dann einen $k$-rationalen Punkt.
 \end{definition}
 
 \begin{notation}
@@ -232,29 +294,191 @@ Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an 
 		\phi(O) = (0 : 1 : 0).
 	\end{equation*}
 \end{proposition}
+\begin{proof}
+	Nach dem Satz von Riemann-Roch und $O \in E(k)$ ist für $n \geq 1$
+	\begin{equation*}
+		\dim \riemannspace(n(O)) = \dim \riemannspace(n(O)) \cap k(E) = n.
+	\end{equation*}
+	Es existiert also $x \in E(k)$ so, dass $\{1, x\}$ eine Basis von $\riemannspace(2(O))$ ist.
+	Das linear unabhängige System $\{1, x\}$ lässt sich nun in $\riemannspace(3(O))$ um ein $y \in E(k)$ zu einer Basis dieses Vektorraums ergänzen.
+	Wegen $\ord_O x = -2$, $\ord_O y = -3$ ist
+	\begin{equation*}
+		1, x, y, x^2, xy, y^2, x^3 \in \riemannspace(6(O))
+	\end{equation*}
+	Da $\dim \riemannspace(6(O)) = 6$ existiert eine nichttriviale Kombination der Null
+	\begin{equation*}
+		A_1 + A_2 x + A_3 y + A_4 x^2 + A_5 x y + A_6 y^2 + A_7 x^3 = 0,
+	\end{equation*}
+	$A_1, \dots, A_7 \in k$, nicht alle $0$.
+	Die Systeme
+	\begin{align*}
+		& \{1, x, y, x^2, xy, y^2\} \\
+		& \{1, x, y, x^2, xy, x^3\}
+	\end{align*}
+	sind beide linear unabhängig, es muss also $A_6 A_7 \neq 0$ gelten.
+	Ein Variablenwechsel
+	\begin{align*}
+		x & \mapsto -A_6A_7 x \\
+		y & \mapsto -A_6A_7^2 y
+	\end{align*}
+	gefolgt von einer Division der Gleichung durch $A_6^3A_7^4 \neq 0$ führt zu einer Weierstraß-Gleichung in $x$ und $y$.
+	Die Bilder der Abbildung
+	\begin{equation*}
+		\phi = [x, y, 1] \rightarrow \projspace^2
+	\end{equation*}
+	erfüllen die oben konstruierte Weierstraß-Gleichung, liegen also auf der durch diese gegebenen Kurve $C \subset \projspace^2$.
+	$\phi$ ist als nichtkonstante rationale Abbildung von Kurven ein Morphismus und surjektiv.
+	Da $y$ in $O$ höhere Polordnung hat, als $x$, ist $\phi(O) = (0 : 1 : 0)$. \\
+	Es ist noch zu zeigen, dass $\phi$ ein Isomorphismus ist. Wir gehen in zwei Schritten vor: 
+	\mathleft
+		\begin{equation*}
+			\begin{array}{ll}
+				(i) & \deg \phi = 1 \\
+				(ii) & C \text{ ist glatt}
+			\end{array}
+		\end{equation*}
+	\mathcenter
+	Dann ist $\phi$ als Morphismus glatter Kurven vom Grad $1$ ein Isomorphismus.
+
+	$(i)$.
+	Wegen $\phi^{\ast} K(C) = K(x, y)$ ist zu zeigen, dass
+	\begin{equation*}
+		[K(E) : K(x, y)] = 1.
+	\end{equation*}
+	Sei $\psi = [x, 1] \colon E \rightarrow \projspace^1$.
+	Da $x$ nur in $O$ einen Pol hat, ist $\psi^{-1}(\{(1 : 0)\}) = \{ O \}$.
+	Wir wollen nun den Verzweigungsgrad von $\psi$ in $O$ bestimmen.
+	Sei $s \in K(E)$ ein uniformisierender Parameter in $O$.
+	$t = Y/X \in K(\projspace^1)$ ist uniformisierender Parameter in $(1 : 0)$.
+	Wegen $\ord_O x = -2$ hat $\psi$ in einer Umgebung von $O$ die Gestalt $P \mapsto ((s^2x)(P) : s^2(P))$.
+	Man erhält
+	\begin{equation*}
+		e_{\psi}(O) = \ord_O\psi^{\ast}(t) = \ord_O \frac{s^2}{s^2x} = 2.
+	\end{equation*}
+	Damit gilt
+	\begin{equation*}
+		\deg \phi = \sum_{P \in \phi^{-1}(\{(1 : 0\})} e_{\phi}(P) = 2,
+	\end{equation*}
+	also wegen $\phi^{\ast}K(C) = K(x)$
+	\begin{equation*}
+		[K(E) : K(x)] = 2.
+	\end{equation*}
+	Analog verfährt man mit $y$ und erhält $[K(E) : K(y)] = 3$.
+	Es ergibt sich $[K(E) : K(x, y)] \divides 2, 3$, d.h.
+	\begin{equation*}
+		[K(E) : K(x, y)] = 1.
+	\end{equation*}
+	
+	$(ii)$.
+	Angenommen, $C$ wäre singulär.
+	Dann existierte $\theta : C \rightarrow \projspace^1$, eine rationale Abbildung vom Grad 1.
+	Die Komposition $\theta \circ \phi : E \rightarrow \projspace^1$ wäre dann eine rationale Abbildung Abbildung glatter Kurven vom Grad 1, also ein Isomorphismus.
+	$E \cong \projspace^1$ steht aber im Widerspruch zu
+	\begin{equation*}
+		\genus(E) = 1 \neq 0 = \genus(\projspace^1).
+	\end{equation*}
+\end{proof}
 
 \begin{definition}
 	$x, y \in k(E)$ wie in \ref{prop-existenz-weierstrass-koordinaten} heißen {\it Weierstraß-Koordinaten}.
 \end{definition}
 
-\begin{proposition}
-	Seien $(x, y)$, $(x', y')$ zwei Paare von Weierstraß-Koordinaten. Dann existieren $u, r, s, t \in k, u \neq 0$ so, dass
-	\begin{align*}
-		x &= u^2 x' + r \\
-		y &= u^3 y' + s u^2 x' + t.
-	\end{align*}
-\end{proposition}
-
-\begin{proposition}
-	Sei $C$ eine nichtsinguläre Kurve über $k$, gegeben durch eine Weierstraß-Gleichung. Dann ist $(C, (0 : 1 : 0))$ eine elliptische Kurve.
-\end{proposition}
+Um die verschiedenen Weierstraß-Koordinaten einer elliptischen Kurve zu klassifizieren, benötigen wir eine kurze Rechnung:
 
 \begin{lemma}
+	\label{lem-polordnungen}
+
+	Sei $C \subset \projspace^2$ eine nichtsinguläre, durch eine Weierstraß-Gleichung gegebene Kurve, $O = (0 : 1 : 0)$.
+	Dann gilt $\ord_O X/Z = -2$, $\ord_O Y/Z = -3$.
+\end{lemma}
+\begin{proof}
+	Die homogene Weierstraß-Gleichung hat die Form
+	\begin{equation*}
+		Y^2 Z + a_1 X Y Z + a_3 Y Z^2 = X^3 + a_2 X^2  Z + a_4 X Z^2 + a_6 Z^3.
+	\end{equation*}
+	Der Punkt $O$ liegt im affinen Bereich $Y \neq 0$, es bietet sich also Dehomogenisierung nach $Y$ an.
+	Umstellen dieser Gleichung nach $Z$ ergibt
+	\begin{equation*}
+		Z = X^3 - a_2 X^2 Z + a_4 X Z^2 + a_6 Z^3 - a_1 X Z - a_3 Z^2.
+	\end{equation*}
+	Der affine Punkt $(0, 0)$ in affinen Koordinaten entspricht dem projektiven Punkt $O$. \\
+	Das Ideal $M_{(0, 0)} \subset k[X, Z]$ der in $(0, 0)$ verschwindenden Polynome wird von $X, Z$ erzeugt.
+	Aus obiger Gleichung ließt man ab, dass $\ord_{(0, 0)} Z \geq 2$ gilt, da sich $Z$ als Summe von Elementen aus $M_{(0, 0)}^2$ schreiben lässt.
+	Aber dann hat jeder der Summanden auf der rechten Seite sogar eine dreifache Nullstelle in $(0, 0)$, also auch $Z$.
+	Da $C$ nichtsingulär ist, ist eine der das Verschwindungsideal $M_{(0, 0)}$ erzeugenden Funktionen $X$, $Z$ ein uniformisierender Parameter in $(0, 0)$ mit Ordnung 1.
+	Es muss also $\ord_{(0, 0)} X = 1$ gelten.
+	Die Annahme $\ord_{(0, 0)} Z > 3$ führt dann durch Umstellen der Weierstraß-Gleichung nach $X^3$ sofort zum Widerspruch.
+	Man erhält
+	\begin{align*}
+		\ord_{(0, 0)} X / Z & = -2 \\
+		\ord_{(0, 0)} 1 / Z & = -3
+	\end{align*}
+	und diese Funktionen entsprechen den projektiven Funktionen $X / Z$ und $Y / Z$.
+\end{proof}
+
+\begin{proposition}
+	Seien $(x_1, y_1)$, $(x_2, y_2)$ zwei Paare von Weierstraß-Koordinaten.
+	Dann existieren $u, r, s, t \in k, u \neq 0$ so, dass
+	\begin{align*}
+		x_1 & = u^2 x_2 + r \\
+		y_1 & = u^3 y_2 + s u^2 x_2 + t.
+	\end{align*}
+\end{proposition}
+\begin{proof}
+	Da die Abbildungen $[x_i, y_i, 1]$ Isomorphismen sind, gilt
+	\begin{align*}
+		\ord_O x_i & = \ord_{(0 : 1 : 0)} X/Z = -2\\
+		\ord_O y_i & = \ord_{(0 : 1 : 0)} Y/Z = -3.
+	\end{align*}
+	$\{1, x_i\}$ bildet also jeweils eine Basis von $\riemannspace(2(O))$ und analog $\{1, x_i, y_i\}$ eine Basis von $\riemannspace(3(O))$.
+	Man findet daher Koeffizienten $v, w, r, s', t \in k, v, w \neq 0$ so, dass
+	\begin{align*}
+		x_1 & = v x_2 + r \\
+		y_1 & = w y_2 + s' x_2 + t.
+	\end{align*}
+	Einsetzen in die Weierstraß-Gleichung, die $x_1, y_1$ erfüllen, ergibt eine kubische Gleichung $C$ in $x_2, y_2$.
+	Da $x_2, y_2$ selbst bereits eine Weierstraß-Gleichung erfüllen, erfüllen die Bilder unter $[x_2, y_2, 1]$ beide Gleichungen, liegen also im Schnitt dieser elliptischen Kurve und $C$.
+	Unendlichen Schnitt haben Kurven nur, wenn sie eine gemeinsame Komponente haben, $C$ muss daher ein Vielfaches der (irreduziblen) Weierstraß-Gleichung sein.
+	Man erhält $v^3 = w^2$, da die Koeffizienten von $Y^2$ und $X^3$ einer Weierstraß-Gleichung identisch $1$ sind.
+	Setzt man $u = w / v$, $s = s' / u^2$, erhält man eine Gleichung der gewünschten Form. 
+\end{proof}
+
+Die Beschreibung elliptischer Kurven durch Weierstraß-Gleichungen wollen wir mit einer einfachen Folgerungen vorheriger Vorträge abschließen, die besagt, dass auch umgekehrt nichtsinguläre Weierstraß-Gleichungen elliptische Kurven sind.
+\begin{proposition}
+	Sei $C$ eine nichtsinguläre Kurve über $k$, gegeben durch eine Weierstraß-Gleichung.
+	Dann ist $(C, (0 : 1 : 0))$ eine elliptische Kurve.
+\end{proposition}
+\begin{proof}
+	Das invariante Differential
+	\begin{equation*}
+		\omega = \frac{dx}{2y + a_1x + a_3}
+	\end{equation*}
+	erfüllt $\divop \omega = 0$. Nach dem Satz von Riemann-Roch gilt damit
+	\begin{equation*}
+		2 \genus(C) - 2 = \deg \divop \omega = 0,
+	\end{equation*}
+	also $\genus(C) = 1$.
+\end{proof}
+
+Im Folgenden kann davon ausgegangen werden, dass die Punkte der elliptischen Kurve vermöge der geometrischen Addition von Punkten die Struktur einer abeslchen Gruppe tragen.
+Wir werden diese Gruppenoperation nun eingehender untersuchen und die eingangs erwähnte Isomorphie mit der Picard-Gruppe konstruieren.
+
+\begin{lemma}
+	\label{lem-divisor-aequivalenz}
+
 	Seien $P, Q \in E$. Dann gilt
 	\begin{equation*}
-		(P) \sim (Q) \Leftrightarrow P = Q
+		(P) \sim (Q) \Leftrightarrow P = Q.
 	\end{equation*}
 \end{lemma}
+\begin{proof}
+	Gelte $(P) \sim (Q)$, d.h.
+	\begin{equation*}
+		(P) - (Q) = \divop f
+	\end{equation*}
+	für ein $f \in K(E)$. Dann ist $f \in \riemannspace((Q))$.
+	Da $1 \in \riemannspace((Q))$ und $\dim \riemannspace((Q)) = 1$, gilt $f \in K$, also $\divop f = 0$ und damit $P = Q$.
+\end{proof}
 
 \begin{proposition}
 	\label{prop-isomorphism-pic}
@@ -262,14 +486,68 @@ Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an 
 	\begin{equation*}
 		\kappa \colon \begin{cases}
 			E \rightarrow \pic^0(E) \\
-			P \mapsto \overline{(P) - (O)}
+			P \mapsto \coset{(P) - (O)}
 		\end{cases}
 	\end{equation*}
 	ist ein Isomorphismus abelscher Gruppen.
 \end{proposition}
+\begin{proof}
+	{\it $\kappa$ ist surjektiv.}
+	Sei $D \in \divgrp^0(E)$. Nach dem Satz von Riemann-Roch ist der Vektorraum
+	\begin{equation*}
+		\riemannspace(D + (O)) = \langle f \rangle
+	\end{equation*}
+	erzeugt von einem Element $f \in K(E)$. Per Definition ist dann $\divop f \geq -D - (O)$, also
+	\begin{equation*}
+		0 = \deg \divop f \geq \deg -D - (O) = -1.
+	\end{equation*}
+	Dies ist nur dann möglich, falls
+	\begin{equation*}
+		\divop f = -D - (O) + P
+	\end{equation*}
+	für ein gewisses $P \in E$, oder, äquivalent,
+	\begin{equation*}
+		D \sim (P) - (O).
+	\end{equation*}
+
+	{\it $\kappa$ ist injektiv.}
+	Für $P, Q \in E$ gilt
+	\begin{equation*}
+		\begin{array}{ll}
+			& \kappa(P) = \kappa(Q) \\
+			\Leftrightarrow & (P) - (O) \sim (Q) - (O) \\
+			\Leftrightarrow & (P) \sim (Q) \\
+			\Leftrightarrow & P = Q
+		\end{array}
+	\end{equation*}
+	nach \ref{lem-divisor-aequivalenz}.
+
+	{\it $\kappa$ ist ein Gruppenhomomorphismus.}
+	Seien wieder $P, Q \in E$.
+	Sei die Gerade durch $P$ und $Q$ durch $f \in K[X, Y, Z]$ gegeben und $R$ ihr dritter Schnittpunkt mit $E$; die Gerade durch $R$ und $O$ sei durch $g \in K[X, Y, Z]$ gegeben.
+	Der Punkt $P + Q$ ist dann der dritte Schnittpunkt dieser Geraden mit $E$.
+	Man erhält
+	\begin{align*}
+		\divop f & = (P) + (Q) + (R) \\
+		\divop g & = (R) + (O) + (P + Q)
+	\end{align*}
+	und damit
+	\begin{equation*}
+		(P) + (Q) \sim (P + Q) + (O),
+	\end{equation*}
+	also
+	\begin{equation*}
+		(P) - (O) + (Q) - (O) \sim (P + Q) - (O),
+	\end{equation*}
+	was
+	\begin{equation*}
+		\kappa(P) + \kappa(Q) = \kappa(P + Q)
+	\end{equation*}
+	zur Folge hat.
+\end{proof}
 
 \begin{proposition}
-	Die natürliche Abbildung
+	Die kanonische Abbildung
 	\begin{equation*}
 		\divgrp_k^0 \mapsto \pic_k^0(E)
 	\end{equation*}
@@ -278,6 +556,25 @@ Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an 
 		E(k) \rightarrowiso \pic_k^0(E).
 	\end{equation*}
 \end{proposition}
+\begin{proof}
+	Wir zeigen zunächst die Aussage über $\kappa$.
+	Wegen $O \in E(k)$ ist $\kappa(E(k)) \subseteq \pic_k^0(E)$.
+	Sei $\coset{D} \in Pic_k^0(E)$. Dann ist für ein $P \in E$
+	\begin{equation*}
+		\coset{D} = \kappa(P) = \coset{(P) - (O)}.
+	\end{equation*}
+	Nach Definition ist $\coset{D}$ unter Galoisoperation invariant.
+	Für beliebiges $\sigma \in \gal(K | k)$ ist also unter Beachtung von $O \in E(k)$
+	\begin{align*}
+		\coset{D} & = \coset{(P) - (O)} \\
+		& = \coset{(P^{\sigma}) - (O)}.
+	\end{align*}
+	Man erhält $(P) \sim (P^{\sigma})$, nach \ref{lem-divisor-aequivalenz} $P = P^{\sigma} \in E(k)$ und damit
+	\begin{equation*}
+		\coset{D} = \coset{(P) - (O)} \in \kappa(E(k)).
+	\end{equation*}
+	Wegen $O \in E(k)$ folgt nun unmittelbar auch die Surjektivität der Abbildung $\divgrp_k^0 \rightarrow \pic_k^0$.
+\end{proof}
 
 \begin{corollary}
 	Die Sequenz
@@ -285,36 +582,78 @@ Im Folgenden wird wieder die klassische Sprache der Varietäten in Anlehnung an 
 		1 \rightarrow k(E)^{\times} \rightarrow \divgrp_k^0(E) \rightarrow \pic_k^0(E) \rightarrow 0
 	\end{equation*}
 	ist exakt.
+	\qed
 \end{corollary}
 
-\begin{corollary}
-	Sei $D \in \divgrp_k(E)$. Dann gilt
-	\begin{equation*}
-		D \sim 0 \Leftrightarrow \deg D = 0 \text{ und } \sum_{P \in E} n_P P = 0.
-	\end{equation*}
-\end{corollary}
+
+Um zu zeigen, dass eine elliptische Kurve ihre eigene Jakobische ist, muss nur noch bewiesen werden, dass die Addition von Punkten der elliptische Kurve ein Morphismus $E \times E \rightarrow E$ ist.
+Mit $E \times E$ ist hier das Produkt in der Kategorie der Varietäten über $k$ gemeint.
+Dieses Produkt lässt sich für nicht algebraisch abgeschlossene Körper in der klassischen Sprache nur schwer formulieren.
+Wir zeigen das Resultat daher nur für den algebraischen Abschluss $K$.
+In der Kategorie der Varietäten über $K$ lässt sich das Produkt $E \times E$ über die Segre-Einbettung als Menge mit dem kartesischen Produkt der einzelnen Trägermengen identifizieren.
 
 \begin{proposition}
 	Die Abbildungen
 	\begin{align*}
-		\operatorname{add} \colon &
+		\operatorname{(+)} \colon &
 		\begin{cases}
-			E \times E \rightarrow E \\
+			E \times_K E \rightarrow E \\
 			(P, Q) \mapsto P + Q
 		\end{cases} \\
-		\operatorname{inv} \colon &
+		\operatorname{(-)} \colon &
 		\begin{cases}
 			E \rightarrow E \\
 			P \mapsto -P
 		\end{cases} \\
-		\operatorname{null} \colon &
+		\operatorname{(0)} \colon &
 		\begin{cases}
 			\affinespace^0 \rightarrow E \\
 			0 \mapsto O
 		\end{cases}
 	\end{align*}
-	sind Morphismen von Varietäten. $E$ wird vermöge dieser Abbildungen zum Gruppenobjekt in der Kategorie der Varietäten über $k$.
+	sind Morphismen von Varietäten.
+	$E$ wird vermöge dieser Abbildungen zum Gruppenobjekt in der Kategorie der Varietäten über $K$.
 \end{proposition}
+
+\begin{proof}
+	Da jede elliptische Kurve zu einer durch eine Weierstraß-Gleichung gegebenen elliptischen Kurve isomorph ist, genügt es, die Behauptung für solche Kurven zu zeigen.
+	Im letzten Vortrag wurden in diesem Fall explizite Formeln zur Berechnung der Summe und des Inversen zweier Punkte bestimmt (siehe auch \cite[III. 2.3]{silverman}).
+	Durch diese polynomiellen Gleichungen definierte Abbildungen sind somit unmittelbar rational.
+	Es ist zu zeigen, dass sie tatsächlich überall definiert sind.
+	\cite[II. Th. 2.3]{silverman}, das garantiert, dass rationale Abbildungen zwischen Kurven sogar Morphismen sind, ist für die Addition $(+)$ nicht anwendbar, da $E \times E$ eine Fläche ist.
+	Trotzdem kann dieses Theorem genutzt werden, um explizite Rechnungen zu vermeiden.
+
+	Wir beginnen mit $(-)$. Für $P = (x : y : 1) \neq O$ ist $-P$ gegeben durch
+	\begin{equation*}
+		-P = (x : -y - a_1 x - a_3 : 1)
+	\end{equation*}
+	Eine entsprechend definierte Abbildung ist überall außer eventuell in $O$ definiert, also rational und damit doch  in $O$ definiert.
+
+	Analog zeigt man, dass für festes $Q \in E$ die Abbildung
+	\begin{equation*}
+		\tau_Q : \begin{cases}
+			E \rightarrow E
+			P \mapsto P + Q
+		\end{cases}
+	\end{equation*}
+	ein Morphismus ist.
+	Die Abbildung $(+)$ lässt sich auf
+	\begin{equation*}
+		E \times E - \{(P, O), (O, P), (P, P), (P, -P) \mid P \in E \}
+	\end{equation*}
+	als Morphismus schreiben, wie man aus den expliziten Additionsformeln entnimmt.
+	Um zu zeigen, dass $(+)$ in einem beliebig gewählten Punkt definiert ist, schreibt man für gewisse $Q_1, Q_2 \in E$
+	\begin{equation*}
+		(+) = \tau_{-Q_1} \circ \tau_{-Q_2} \circ (+) \circ (\tau_{Q_1} \times \tau_{Q_2})
+	\end{equation*}
+	Dadurch werden eventuell undefinierte Stellen \glqq verschoben\grqq, sodass $(+)$ auch auf
+	\begin{equation*}
+		E \times E - \{(P - Q_1, -Q_2), (-Q_1, P - Q_2), (P - Q_1, P - Q_2), (P - Q_1, -P - Q_2) \mid P \in E \}
+	\end{equation*}
+	definiert ist.
+	Für jeden Punkt $(P_1, P_2) \in E \times E$ lassen sich offenbar $Q_1, Q_2 \in E$ so wählen, dass obiges Verschiebungsargument auch die Definiertheit von $(+)$ in $(P_1, P_2)$ liefert.
+\end{proof}
+
 
 \printbibliography
 
